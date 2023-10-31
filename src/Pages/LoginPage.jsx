@@ -11,8 +11,13 @@ import {
 import { ToastError, ToastSuccess } from "../Components/toastService/toastService";
 import axios from "axios";
 import { BaseUrl } from "../constants/constants";
+import { UserDetails } from "../Service/Services";
+import { jwtDecode } from "jwt-decode";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../Redux/UserSlice";
 function LoginPage() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [Form, setForm] = useState({
     email: "",
     password: "",
@@ -51,8 +56,10 @@ function LoginPage() {
           if (response.status === 200){
             const token = JSON.stringify(response.data);
             localStorage.setItem("token", token);
+            const decoded = jwtDecode(token);
+            ReduxStoring(decoded.user_id)
             ToastSuccess("Login completed successfully!");
-            navigate('/')
+            navigate('/', { state: { user_id: decoded?.user_id?decoded?.user_id:null} })
           }
       } catch (error) {
           ToastError(error.response.data.detail)
@@ -62,8 +69,18 @@ function LoginPage() {
   };
 
   // usedata storing Redux
-  const ReduxStoring = (id) =>{
-    
+  const ReduxStoring = async (id) =>{
+    const res = await UserDetails(id)
+    if (res.status === 200){
+      const data = {
+        id: res.data.id,
+        first_name: res.data.first_name,
+        last_name: res.data.last_name,
+        email: res.data.email,
+        profile_image: res.data.profile_image,
+      }
+      dispatch(setUserDetails({UserInfo:data}))
+    }
   }
   useEffect(()=>{
 document.title = 'Login Page'

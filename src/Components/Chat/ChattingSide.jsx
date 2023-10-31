@@ -1,12 +1,98 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ConnectToPeople from "../../assets/ConnectToPeople.avif";
 import DefaultProfileImg from "../../assets/DefaultProfileImg.avif";
+import { useSelector } from "react-redux";
+import { UserDetails } from "../../Service/Services";
+import { userAxiosInstant } from "../../AxiosUtils/AxiosUtils";
+import { wsApiUrl } from "../../constants/constants";
+import { w3cwebsocket as W3CWebSocket } from "websocket";
 
 function ChattingSide({ Reciever }) {
+  const { UserInfo} = useSelector((state) => state.user);
+  const [senderdetails, setsenderdetails] = useState(UserInfo);
+  const [recipientdetails, setrecipientdetails] = useState();
   const [clientstate, setClientState] = useState("");
   const [messages, setMessages] = useState([]);
   const messageRef = useRef();
+  const onButtonClicked = () => {
+    if (messageRef.current.value.trim() == "") {
+      return;
+    }
+    clientstate.send(
+      JSON.stringify({
+        message: messageRef.current.value,
+        senderUsername: senderdetails.email,
+        receiverUsername: recipientdetails.email,
+      })
+    );
+    messageRef.current.value = "";
+  };
+
+  const setUpChat = () => {
+    userAxiosInstant
+      .get(
+        `chat/user-previous-chats/${senderdetails.id}/${recipientdetails.id}/`
+      )
+      .then((response) => {
+        if (response.status == 200) {
+          setMessages(response.data);
+        }
+      });
+    const client = new W3CWebSocket(
+      `${wsApiUrl}/ws/chat/${senderdetails.id}/?${recipientdetails.id}`
+    );
+    setClientState(client);
+    client.onopen = () => {
+      console.log("WebSocket Client Connected");
+    };
+    client.onmessage = (message) => {
+      const dataFromServer = JSON.parse(message.data);
+      console.log(dataFromServer,'daxooo');
+      if (dataFromServer) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            message: dataFromServer.message,
+            sender_email: dataFromServer.senderUsername,
+          },
+        ]);
+      }
+    };
+
+    client.onclose = () => {
+      console.log("Websocket disconnected", event.reason);
+    };
+
+    return () => {
+      client.close();
+    };
+  };
+
+  useEffect(() => {
+    if (senderdetails.id != null && recipientdetails?.id != null) {
+      setUpChat();
+    }
+    if (messageRef.current) {
+      messageRef.current.scrollTop = messageRef.current.scrollHeight;
+    }
+  }, [senderdetails, recipientdetails?.id]);
+
+
+  const recieverData = async () =>{
+    try {
+      const res = await UserDetails(Reciever.id)
+      setrecipientdetails(res.data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(()=>{
+    recieverData()
+  },[Reciever?.id])
+
+  // Chating
   return (
+
     <>
       {!Reciever ? (
         <div className="h-screen grid grid-rows-[9rem,1fr]">
@@ -68,42 +154,47 @@ function ChattingSide({ Reciever }) {
             </div>
           </div>
           <div class="p-4 overflow-auto h-[44.4rem]">
-            <>
-              <div class="flex justify-end mb-2">
-                <div class="bg-purple-50 shadow border text-gray-800 py-1 px-4 rounded-md max-w-xs">
-                  {/* {message.message} */}hai ima sender
-                </div>
-                <div className="rounded-full flex justify-center items-center -me-3 ms-1 w-7 h-7 ">
-                  <img
-                    // src={
-                    //   senderdetails.profile_image
-                    //     ? senderdetails.profile_image
-                    //     : defaultprofile
-                    // }
-                    alt=""
-                    className="rounded-full w-5 h-5"
-                  />
-                </div>
-              </div>
-            </>
-            <>
-              <div class="flex mb-2">
-                <div className="rounded-full flex justify-center items-center -ms-4 me-1 w-7 h-7 ">
-                  <img
-                    src={
-                      Reciever.profile_image
-                        ? recipientdetails.profile_image
-                        : DefaultProfileImg
-                    }
-                    alt=""
-                    className="rounded-full w-5 h-5"
-                  />
-                </div>
-                <div class="shadow py-1 px-4 rounded-md max-w-xs">
-                  {/* {message.message} */}hai this is reciever
-                </div>
-              </div>
-            </>
+          {messages.map((message, index) =>
+                    senderdetails.email === message.sender_email? (
+                      <>
+                        <div class="flex justify-end mb-2" key={index}>
+                          <div class="bg-purple-50 shadow border text-gray-800 py-1 px-4 rounded-md max-w-xs">
+                            {message.message}
+                          </div>
+                          <div className="rounded-full flex justify-center items-center -me-3 ms-1 w-7 h-7 ">
+                            <img
+                              src={
+                                senderdetails.profile_image
+                                  ? senderdetails.profile_image
+                                  : DefaultProfileImg
+                              }
+                              alt=""
+                              className="rounded-full w-5 h-5"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div class="flex mb-2" key={index}>
+                          <div className="rounded-full flex justify-center items-center -ms-4 me-1 w-7 h-7 ">
+                            <img
+                              src={
+                                recipientdetails.profile_image
+                                  ? recipientdetails.profile_image
+                                  : DefaultProfileImg
+                              }
+                              alt=""
+                              className="rounded-full w-5 h-5"
+                            />
+                          </div>
+                          <div class="shadow py-1 px-4 rounded-md max-w-xs">
+                            {message.message}
+                          </div>
+                        </div>
+                      </>
+                    )
+                  )}
           </div>
           <div className="grid grid-cols-[3rem,1fr,3rem] border-t">
             <div className="flex justify-center items-center">
@@ -122,16 +213,17 @@ function ChattingSide({ Reciever }) {
                 />
               </svg>
             </div>
-            <div className="flex  justify-center items-center rounded-xl">
+            <div className="flex justify-center items-center rounded-xl">
               <input
               ref={messageRef}
                 placeholder="Search"
                 type="text"
-                className="bg-transparent bg-gray-200 p-2 rounded-2xl w-full text-gray-800 placeholder-gray-700 text-sm focus:outline-none"
+                className="border bg-gray-200 p-2 rounded-2xl w-full text-gray-800 placeholder-gray-700 text-sm focus:outline-none"
               />
             </div>
             <div className="flex justify-center items-center">
               <svg
+              onClick={onButtonClicked}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

@@ -9,10 +9,16 @@ import {
   MenuItem,
   Button,
 } from "@material-tailwind/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { LogoutDetails } from "../Redux/UserSlice";
 
 function ChattingPage() {
+  const location = useLocation();
+  const user_id = location.state && location.state.user_id;
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { UserInfo} = useSelector((state) => state.user);
   const [Search, setSearch] = useState("");
   const [Reciever, setReciever] = useState();
   const [SearchList, setSearchList] = useState();
@@ -20,20 +26,21 @@ function ChattingPage() {
   // Logout
   const LogOutBtn = () =>{
     localStorage.removeItem('token')
+    dispatch(LogoutDetails())
     navigate('/login')
   }
   // For searching
   const HandleSearch = async (e) => {
     const search = e.target.value;
     setSearch(search);
-    const res = await UserList(search);
+    const res = await UserList(search,UserInfo.id);
     if (res.status === 200) {
       setSearchList(res.data);
     }
   };
   const UsersLists = async () => {
     try {
-      const res = await UserList("");
+      const res = await UserList("",user_id?user_id:UserInfo.id);
       if (res.status === 200) {
         setSearchList(res.data);
       }
