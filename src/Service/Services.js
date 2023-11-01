@@ -1,5 +1,22 @@
 import { userAxiosInstant } from "../AxiosUtils/AxiosUtils";
 
+// Logout
+const Logout = (refresh) => {
+  let authToken = localStorage.getItem("token");
+  const refreshtoken = JSON.parse(authToken);
+  return userAxiosInstant
+    .post('auth/logout/' , { refresh: refreshtoken.refresh }, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      if (error.response.status === 401) {
+        RefreshToken();
+      } else {
+        error.response;
+      }
+    });
+};
+
 // Chatting side List User
 const UserList = (search, id) => {
   return userAxiosInstant
@@ -57,4 +74,4 @@ const ChatHistory = (senderdetails,recipientdetails) => {
     });
 };
 
-export { UserList, UserDetails ,ChatHistory};
+export { Logout,UserList, UserDetails ,ChatHistory};

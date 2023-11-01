@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ChattingSide from "../Components/Chat/ChattingSide";
-import { UserList } from "../Service/Services";
+import { Logout, UserList } from "../Service/Services";
 import DefaultProfileImg from "../assets/DefaultProfileImg.avif";
 import {
   Menu,
@@ -24,10 +24,17 @@ function ChattingPage() {
   const [SearchList, setSearchList] = useState();
 
   // Logout
-  const LogOutBtn = () =>{
-    localStorage.removeItem('token')
-    dispatch(LogoutDetails())
-    navigate('/login')
+  const LogOutBtn = async () =>{
+    try {
+      const res = await Logout()
+    //  console.log(res);
+      // if (res.status)
+    } catch (error) {
+      console.log(error,'daxooo');
+    }
+    // localStorage.removeItem('token')
+    // dispatch(LogoutDetails())
+    // navigate('/login')
   }
   // For searching
   const HandleSearch = async (e) => {
