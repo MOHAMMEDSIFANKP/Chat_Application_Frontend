@@ -12,42 +12,43 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutDetails } from "../Redux/UserSlice";
+import AddUserModal from "../Components/AddUserModal/AddUserModal";
 
 function ChattingPage() {
   const location = useLocation();
   const user_id = location.state && location.state.user_id;
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { UserInfo} = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { UserInfo } = useSelector((state) => state.user);
   const [Search, setSearch] = useState("");
   const [Reciever, setReciever] = useState();
   const [SearchList, setSearchList] = useState();
 
   // Logout
-  const LogOutBtn = async () =>{
+  const LogOutBtn = async () => {
     try {
-      const res = await Logout()
-    //  console.log(res);
-      // if (res.status)
+      const res = await Logout();
+      if (res.status === 200) {
+        localStorage.removeItem("token");
+        dispatch(LogoutDetails());
+        navigate("/login");
+      }
     } catch (error) {
-      console.log(error,'daxooo');
+      console.log(error);
     }
-    // localStorage.removeItem('token')
-    // dispatch(LogoutDetails())
-    // navigate('/login')
-  }
+  };
   // For searching
   const HandleSearch = async (e) => {
     const search = e.target.value;
     setSearch(search);
-    const res = await UserList(search,UserInfo.id);
+    const res = await UserList(search, UserInfo.id);
     if (res.status === 200) {
       setSearchList(res.data);
     }
   };
   const UsersLists = async () => {
     try {
-      const res = await UserList("",user_id?user_id:UserInfo.id);
+      const res = await UserList("", user_id ? user_id : UserInfo.id);
       if (res.status === 200) {
         setSearchList(res.data);
       }
@@ -59,7 +60,7 @@ function ChattingPage() {
   }, []);
   return (
     <div className="grid w-full h-screen xl:grid-cols-[22rem,1fr] md:grid-cols-[18rem,1fr]">
-      <div className="border my-2 rounded-xl ms-2 grid grid-rows-[5rem,4rem,1fr] px-6">
+      <div className="border my-2 rounded-xl ms-2 grid grid-rows-[5rem,4rem,4rem,1fr] px-6">
         <div className="flex items-center justify-between">
           <p className="font-bold text-3xl">Chats</p>
           <div className="cursor-pointer">
@@ -143,6 +144,9 @@ function ChattingPage() {
           </div>
         </div>
         <div>
+          <AddUserModal/>
+        </div>
+        <div>
           {SearchList ? (
             SearchList.map((list, index) => (
               <div
@@ -185,7 +189,7 @@ function ChattingPage() {
           )}
         </div>
       </div>
-      <div className="border my-2 me-2 rounded-xl">
+      <div className="border mt-1 pe-2 rounded-xl">
         <ChattingSide Reciever={Reciever} />
       </div>
     </div>
