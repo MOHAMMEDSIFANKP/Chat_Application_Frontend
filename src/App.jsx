@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import ChattingPage from "./Pages/ChattingPage";
 import Protected from "./ProtectedRoutes/Protected";
 import PrivateRoutes from "./ProtectedRoutes/PrivateRoutes";
+import ChatPage from "./Pages/ChatPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route element={<PrivateRoutes/>}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/chat" element={<ChatPage />} />
         </Route>
 
         <Route element  ={<Protected/>}>
