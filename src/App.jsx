@@ -16,11 +16,11 @@ function App() {
         <Route element={<PrivateRoutes/>}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/chat" element={<ChatPage />} />
         </Route>
 
         <Route element  ={<Protected/>}>
-          <Route path="/" element={<ChattingPage />} />
+          <Route path="/chat" element={<ChattingPage />} />
+          <Route path="/" element={<ChatPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

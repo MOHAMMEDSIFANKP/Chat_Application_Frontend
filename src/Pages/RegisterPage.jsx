@@ -10,66 +10,170 @@ import {
 } from "../Components/toastService/toastService";
 import { BaseUrl } from "../constants/constants";
 import { useNavigate } from "react-router-dom";
+
+import './LoginPage.css'
+// Google authendication
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
+
+// Formic
+import { useFormik } from 'formik';
+import { RegisterSchema } from "../Formik/Validations";
+import { UserDetails } from "../Service/Services";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../Redux/UserSlice";
 function RegisterPage() {
   const navigate = useNavigate()
-  const [Form, setForm] = useState({
+  const dispatch = useDispatch();
+
+  // const [Form, setForm] = useState({
+  //   first_name: "",
+  //   last_name: "",
+  //   email: "",
+  //   password: "",
+  // });
+  // const [error, seterror] = useState({
+  //   first_name: false,
+  //   last_name: false,
+  //   email: false,
+  //   password: false,
+  // });
+  // //   Validation
+  // function Validation() {
+  //   if (Form.first_name.trim() === "") {
+  //     seterror({ ...error, first_name: true });
+  //     ToastWarning("First name should be empty");
+  //     return false;
+  //   } else if (Form.last_name.trim() === "") {
+  //     seterror({ ...error, last_name: true });
+  //     ToastWarning("Last name should be empty");
+  //     return false;
+  //   } else if (Form.email.trim() === "") {
+  //     seterror({ ...error, email: true });
+  //     ToastWarning("Email name should be empty");
+  //     return false;
+  //   } else if (!isValidEmail(Form.email.trim())) {
+  //     seterror({ ...error, email: true });
+  //     ToastWarning("Please enter Valid email");
+  //     return false;
+  //   } else if (Form.password.trim() === "") {
+  //     seterror({ ...error, password: true });
+  //     ToastWarning("Password should be empty");
+  //     return false;
+  //   }
+  //   return true;
+  // }
+  // function isValidEmail(email) {
+  //   const Regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  //   return Regex.test(email);
+  // }
+  // //   Form Submission
+  // const FormSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (Validation()) {
+  //     try {
+  //       const response = await axios.post(`${BaseUrl}/auth/registration/`, Form);
+  //         if (response.status === 201){
+  //           ToastSuccess("Registration completed successfully!");
+  //           navigate('/login')
+  //         }
+  //     } catch (error) {
+  //       if (error.response.data){
+  //         ToastError(error.response.data.email[0])
+  //       }else{
+  //         console.log(error);
+  //       }
+  //     }
+  //   }
+  // };
+  const [isGoogle, setIsGoogle] = useState(false)
+  const initialValues = {
     first_name: "",
     last_name: "",
     email: "",
-    password: "",
-  });
-  const [error, seterror] = useState({
-    first_name: false,
-    last_name: false,
-    email: false,
-    password: false,
-  });
-  //   Validation
-  function Validation() {
-    if (Form.first_name.trim() === "") {
-      seterror({ ...error, first_name: true });
-      ToastWarning("First name should be empty");
-      return false;
-    } else if (Form.last_name.trim() === "") {
-      seterror({ ...error, last_name: true });
-      ToastWarning("Last name should be empty");
-      return false;
-    } else if (Form.email.trim() === "") {
-      seterror({ ...error, email: true });
-      ToastWarning("Email name should be empty");
-      return false;
-    } else if (!isValidEmail(Form.email.trim())) {
-      seterror({ ...error, email: true });
-      ToastWarning("Please enter Valid email");
-      return false;
-    } else if (Form.password.trim() === "") {
-      seterror({ ...error, password: true });
-      ToastWarning("Password should be empty");
-      return false;
-    }
-    return true;
+    password: ""
   }
-  function isValidEmail(email) {
-    const Regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    return Regex.test(email);
-  }
-  //   Form Submission
-  const FormSubmit = async (e) => {
-    e.preventDefault();
-    if (Validation()) {
-      try {
-        const response = await axios.post(`${BaseUrl}/auth/registration/`, Form);
-          if (response.status === 201){
-            ToastSuccess("Registration completed successfully!");
-            navigate('/login')
-          }
-      } catch (error) {
-        if (error.response.data){
-          ToastError(error.response.data.email[0])
-        }else{
-          console.log(error);
+  const {
+    values,
+    errors,
+    touched,
+    handleBlur,
+    handleSubmit,
+    handleChange,
+  } = useFormik({
+    initialValues: initialValues,
+    validationSchema: RegisterSchema,
+    onSubmit: (values, { setSubmitting }) => {
+      RegisterhandleSubmitForm(values, setSubmitting);
+    },
+  });
+
+  const RegisterhandleSubmitForm = async (values, setSubmitting) => {
+    try {
+
+      if (!isGoogle) {
+        const response = await axios.post(`${BaseUrl}/auth/registration/`, values);
+        if (response.status === 201) {
+          ToastSuccess('Registration completed successfully!');
+          navigate("/login");
+        }
+      }else {
+        const response = await axios.post(`${BaseUrl}/auth/googeregister/`, values);
+        if (response.status === 201) {
+          console.log(response,'daxoo');
+          setIsGoogle(false)
+          const token = JSON.stringify(response.data.token);
+          localStorage.setItem("token", token);
+          ToastSuccess(response.data?.msg || 'Registration compleated');
+          // const decoded = jwtDecode(token);
+          // console.log(decoded);
+          // ReduxStoring(decoded.user_id);
+          navigate("/", {
+            state: { user_id: decoded?.user_id ? decoded?.user_id : null },
+          });
         }
       }
+      
+    } catch (error) {
+      setIsGoogle(false)
+      ToastError(error.response?.data?.email[0] || 'An error occurred');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  // Google Login Function
+  const [guser, setgUser] = useState([]);
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => setgUser(codeResponse),
+    onError: (error) => console.log('Login Failed:', error)
+  });
+
+  useEffect(() => {
+    if (guser && guser.access_token) {
+      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${guser.access_token}`)
+        .then((res) => {
+          RegisterhandleSubmitForm({first_name: res.data.given_name, last_name: res.data.family_name, profile_image: res.data.picture, email: res.data.email, password: res.data.id })
+        })
+        .catch((err) => {
+          setIsGoogle(false);
+          console.log(err);
+        });
+    }
+  }, [guser, login]);
+  
+
+
+  // usedata storing Redux
+  const ReduxStoring = async (id) => {
+    const res = await UserDetails(id);
+    if (res.status === 200) {
+      const data = {
+        id: res.data.id,
+        first_name: res.data.first_name,
+        last_name: res.data.last_name,
+        email: res.data.email,
+        profile_image: res.data.profile_image,
+      };
+      dispatch(setUserDetails({ UserInfo: data }));
     }
   };
   useEffect(() => {
@@ -90,49 +194,88 @@ function RegisterPage() {
           <Typography variant="h4" color="blue-gray">
             Create a Connection
           </Typography>
+          <div className='mt-8 mb-3 w-full'>
+            <button className="gsi-material-button w-full" onClick={()=>{login(),setIsGoogle(true)}}>
+              <div className="gsi-material-button-state"></div>
+              <div className="gsi-material-button-content-wrapper">
+                <div className="gsi-material-button-icon">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" xmlnsXlink="http://www.w3.org/1999/xlink" style={{ display: 'block' }}>
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+                    <path fill="none" d="M0 0h48v48H0z"></path>
+                  </svg>
+                </div>
+                <span className="gsi-material-button-contents">Sign in with Google</span>
+                <span style={{ display: 'none' }}>Sign in with Google</span>
+              </div>
+            </button>
+          </div>
+          <div className='flex justify-center items-center w-full'>
+            <hr className='w-full border-t-2 border-gray-300' />
+            <p className='mx-4'>or</p>
+            <hr className='w-full border-t-2 border-gray-300' />
+          </div>
           <form
-            className="mt-8 mb-2 w-full max-w-screen-lg sm:w-96"
-            onSubmit={FormSubmit}
+            className="mt-3 mb-2 w-full max-w-screen-lg sm:w-96"
+            onSubmit={handleSubmit}
           >
             <div className="mb-1 flex flex-col gap-6">
-              <Input
-                autoFocus={true}
-                variant="standard"
-                label="First Name"
-                error={error.first_name ? error : ""}
-                onChange={(e) => {
-                  setForm({ ...Form, first_name: e.target.value });
-                  seterror({ ...error, first_name: false });
-                }}
-              />
-              <Input
-                variant="standard"
-                label="Last Name"
-                error={error.last_name ? error : ""}
-                onChange={(e) => {
-                  setForm({ ...Form, last_name: e.target.value });
-                  seterror({ ...error, last_name: false });
-                }}
-              />
-              <Input
-                variant="standard"
-                label="Email"
-                error={error.email ? error : ""}
-                onChange={(e) => {
-                  setForm({ ...Form, email: e.target.value });
-                  seterror({ ...error, email: false });
-                }}
-              />
-              <Input
-                type="password"
-                variant="standard"
-                label="Password"
-                error={error.password ? error : ""}
-                onChange={(e) => {
-                  setForm({ ...Form, password: e.target.value });
-                  seterror({ ...error, password: false });
-                }}
-              />
+              <div>
+                <Input
+                  autoFocus={true}
+                  variant="standard"
+                  label="First Name"
+                  name="first_name"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.first_name}
+                />
+                {touched.first_name && errors.first_name && (
+                  <div className="text-red-500 text-sm ">{errors.first_name}</div>
+                )}
+              </div>
+              <div>
+                <Input
+                  variant="standard"
+                  label="Last Name"
+                  name="last_name"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.last_name}
+                />
+                {touched.last_name && errors.last_name && (
+                  <div className="text-red-500 text-sm ">{errors.last_name}</div>
+                )}
+              </div>
+              <div>
+                <Input
+                  variant="standard"
+                  label="Email"
+                  name="email"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.email}
+                />
+                {touched.email && errors.email && (
+                  <div className="text-red-500 text-sm ">{errors.email}</div>
+                )}
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  variant="standard"
+                  label="Password"
+                  name="password"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.password}
+                />
+                {touched.password && errors.password && (
+                  <div className="text-red-500 text-sm ">{errors.password}</div>
+                )}
+              </div>
             </div>
             <div className="flex justify-center mt-8 items-center">
               <button

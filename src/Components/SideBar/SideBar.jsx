@@ -16,14 +16,14 @@ function SideBar() {
                     <Tooltip content="Add Friends">
                         <div className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
                             <button>
-                                <IoMdAdd className='h-8 w-8 ' />
+                                <IoMdAdd className='h-6 w-6 ' />
                             </button>
                         </div>
                     </Tooltip>
                     <Tooltip content="Message">
                         <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
                             <button>
-                                <BiSolidMessage className='h-8 w-8 ' />
+                                <BiSolidMessage className='h-6 w-6 ' />
                             </button>
                         </div>
                     </Tooltip>
@@ -33,20 +33,20 @@ function SideBar() {
                     <Tooltip content="Profile">
                         <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
                             <button>
-                                <FaUser className='h-8 w-8 ' />
+                                <FaUser className='h-6 w-6 ' />
                             </button>
                         </div>
                     </Tooltip>  
                     <Tooltip content="Settings">
                     <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
-                        <IoMdSettings className='w-8 h-8' />
+                        <IoMdSettings className='w-6 h-6' />
                     </div>
                     </Tooltip>  
                 </div>
                 <div className='text-gray-600 flex justify-center'>
                 <Tooltip content="Logout">
                     <div className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
-                        <BiLogOut className='w-8 h-8' />
+                        <BiLogOut className='w-6 h-6' />
                     </div>
                     </Tooltip>  
                 </div>

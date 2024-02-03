@@ -1,11 +1,11 @@
 import React from 'react'
-import ChattingPage from '../Pages/ChattingPage'
-import { Outlet } from 'react-router-dom'
+import { Outlet,useNavigate } from 'react-router-dom'
 
 function PrivateRoutes() {
+    const navigate = useNavigate();
     const token = localStorage.getItem('token')
     if (token){
-        return <ChattingPage/>
+        navigate('/');
     }
     return <Outlet/> 
 }
