@@ -5,7 +5,37 @@ import { BiSolidMessage } from "react-icons/bi";
 import { FaUser } from 'react-icons/fa';
 import Logo from '../../assets/Logo.png'
 import { Tooltip } from '@material-tailwind/react';
+import { useNavigate } from 'react-router-dom';
+
+import { LogoutDetails } from '../../Redux/UserSlice';
+import { Logout } from '../../Service/Services';
+import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+
+
 function SideBar() {
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const location = useLocation();
+
+    const currentPath = location.pathname;
+
+    // Logout
+    const SignoutFunc = async () => {
+        try {
+            const res = await Logout();
+            if (res.status === 200) {
+                localStorage.removeItem("token");
+                dispatch(LogoutDetails());
+                navigate("/login");
+            }
+        } catch (error) {
+            localStorage.removeItem("token");
+            dispatch(LogoutDetails());
+            navigate("/login");
+            console.log(error);
+        }
+    };
     return (
         <>
             <div className='grid grid-rows-[7rem,1fr,1fr,5rem] ms-2'>
@@ -14,14 +44,14 @@ function SideBar() {
                 </div>
                 <div className='text-gray-700'>
                     <Tooltip content="Add Friends">
-                        <div className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
+                        <div onClick={() => navigate('/users')} className={`h-10 w-15 ${currentPath === '/users' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mb-2`}>
                             <button>
                                 <IoMdAdd className='h-6 w-6 ' />
                             </button>
                         </div>
                     </Tooltip>
                     <Tooltip content="Message">
-                        <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
+                        <div onClick={() => navigate('/chat')} className={`h-10 w-15 ${currentPath === '/chat' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2`}>
                             <button>
                                 <BiSolidMessage className='h-6 w-6 ' />
                             </button>
@@ -31,24 +61,24 @@ function SideBar() {
                 <div className='text-gray-700'>
                     <hr className='ms-3 border-gray-800' />
                     <Tooltip content="Profile">
-                        <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
+                        <div onClick={() => navigate('/profile')} className={`h-10 w-15 ${currentPath === '/profile' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center my-2`}>
                             <button>
                                 <FaUser className='h-6 w-6 ' />
                             </button>
                         </div>
-                    </Tooltip>  
+                    </Tooltip>
                     <Tooltip content="Settings">
-                    <div className='h-10 w-15 mt-4 hover:bg-white hover:rounded-lg flex justify-center items-center'>
-                        <IoMdSettings className='w-6 h-6' />
-                    </div>
-                    </Tooltip>  
+                        <div onClick={() => navigate('/settings')} className={`h-10 w-15 ${currentPath === '/settings' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2`}>
+                            <IoMdSettings className='w-6 h-6' />
+                        </div>
+                    </Tooltip>
                 </div>
                 <div className='text-gray-600 flex justify-center'>
-                <Tooltip content="Logout">
-                    <div className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
-                        <BiLogOut className='w-6 h-6' />
-                    </div>
-                    </Tooltip>  
+                    <Tooltip content="Logout">
+                        <div onClick={SignoutFunc} className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
+                            <BiLogOut className='w-6 h-6' />
+                        </div>
+                    </Tooltip>
                 </div>
             </div>
         </>

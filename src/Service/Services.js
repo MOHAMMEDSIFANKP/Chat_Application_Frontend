@@ -1,19 +1,15 @@
 import { userAxiosInstant } from "../AxiosUtils/AxiosUtils";
 
 // Logout
-const Logout = (refresh) => {
+const Logout = () => {
   let authToken = localStorage.getItem("token");
   const refreshtoken = JSON.parse(authToken);
   return userAxiosInstant
-    .post('auth/logout/' , { refresh: refreshtoken.refresh }, {
+    .post('auth/logout/', { refresh: refreshtoken.refresh }, {
       withCredentials: true,
     })
     .catch((error) => {
-      if (error.response.status === 401) {
-        RefreshToken();
-      } else {
-        error.response;
-      }
+      error.response;
     });
 };
 
@@ -24,27 +20,11 @@ const UserList = (search, id) => {
       withCredentials: true,
     })
     .catch((error) => {
-      if (error.response.status === 401) {
-        RefreshToken();
-      } else {
-        error.response;
-      }
+      error.response;
     });
 };
 
-const RefreshToken = async () => {
-  let authToken = localStorage.getItem("token");
-  const refreshtoken = JSON.parse(authToken);
-  const res = await userAxiosInstant.post(
-    "auth/token/refresh/",
-    { refresh: refreshtoken.refresh },
-    { withCredentials: true }
-  );
-  if (res.status === 200) {
-    const token = JSON.stringify(res.data);
-    localStorage.setItem("token", token);
-  }
-};
+
 // User Detil view
 const UserDetails = (id) => {
   return userAxiosInstant
@@ -52,26 +32,18 @@ const UserDetails = (id) => {
       withCredentials: true,
     })
     .catch((error) => {
-      if (error.response.status === 401) {
-        RefreshToken();
-      } else {
-        error.response;
-      }
+      error.response;
     });
 };
 // User Chat History
-const ChatHistory = (senderdetails,recipientdetails) => {
+const ChatHistory = (senderdetails, recipientdetails) => {
   return userAxiosInstant
-    .get( `chat/user-previous-chats/${senderdetails}/${recipientdetails}/`, {
+    .get(`chat/user-previous-chats/${senderdetails}/${recipientdetails}/`, {
       withCredentials: true,
     })
     .catch((error) => {
-      if (error.response.status === 401) {
-        RefreshToken();
-      } else {
-        error.response;
-      }
+      error.response;
     });
 };
 
-export { Logout,UserList, UserDetails ,ChatHistory};
+export { Logout, UserList, UserDetails, ChatHistory };

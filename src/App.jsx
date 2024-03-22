@@ -3,11 +3,13 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ChattingPage from "./Pages/ChattingPage";
 import Protected from "./ProtectedRoutes/Protected";
 import PrivateRoutes from "./ProtectedRoutes/PrivateRoutes";
-import ChatPage from "./Pages/ChatPage";
-
+import Homepage from "./Pages/Homepage";
+import ChatComponents from "./Components/ChatComponents/ChatComponents";
+import PeopleListComponents from "./Components/PeopleList/PeopleList";
+import Profile from "./Components/Profile/Profile";
+import Settings from "./Components/Settings/Settings";
 function App() {
   return (
     <BrowserRouter>
@@ -18,9 +20,13 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
         </Route>
 
-        <Route element  ={<Protected/>}>
-          <Route path="/chat" element={<ChattingPage />} />
-          <Route path="/" element={<ChatPage />} />
+        <Route element ={<Protected/>}>
+          <Route path="/" element={<Homepage />} >
+          <Route path="/chat" element={<ChatComponents />} />
+          <Route path="/users" element={<PeopleListComponents />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

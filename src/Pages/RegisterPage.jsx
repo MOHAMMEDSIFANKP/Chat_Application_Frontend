@@ -7,7 +7,7 @@ import {
   ToastError,
   ToastSuccess,
   ToastWarning,
-} from "../Components/toastService/toastService";
+} from "../Components/Toast/Toast";
 import { BaseUrl } from "../constants/constants";
 import { useNavigate } from "react-router-dom";
 

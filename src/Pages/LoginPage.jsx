@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import bgimage from "../assets/background.jpg";
 import { Card, Input, Typography, } from "@material-tailwind/react";
-import { ToastError, ToastSuccess, } from "../Components/toastService/toastService";
+import { ToastError, ToastSuccess, } from "../Components/Toast/Toast";
 import axios from "axios";
 import { BaseUrl } from "../constants/constants";
 import { jwtDecode } from "jwt-decode";
@@ -48,7 +48,7 @@ function LoginPage() {
         ToastSuccess('Login completed successfully!');
         const decoded = jwtDecode(token);
         ReduxStoring(decoded.user_id);
-        navigate("/", {
+        navigate("/chat", {
           state: { user_id: decoded?.user_id ? decoded?.user_id : null },
         });
       }

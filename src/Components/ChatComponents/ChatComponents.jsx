@@ -151,7 +151,7 @@ function ChatComponents() {
             <p className='text-xl font-bold text-black'>Chat</p>
           </div>
           <div className='overflow-y-auto rounded-lg bg-white h-[46rem] '>
-            {SearchList.map((userlist) => (
+            {SearchList.length > 0 ?SearchList.map((userlist) => (
               <div className={`${recipientdetails?.id === userlist.id ? 'h-16 m-2 px-2 bg-gray-200 grid grid-cols-[3rem,1fr,3rem] cursor-pointer rounded-lg' : 'h-16 m-2 px-2 bg-white grid grid-cols-[3rem,1fr,3rem] cursor-pointer hover:rounded-lg hover:bg-gray-100'}`}
                 onClick={() => setrecipientdetails({
                   email: userlist.email,
@@ -170,7 +170,7 @@ function ChatComponents() {
                 </div>
 
                 <div className='m-3'>
-                  <p className='text-black text-sm capitalize'>{userlist.first_name} {userlist.first_name}</p>
+                  <p className='text-black text-sm capitalize'>{userlist.first_name} {userlist.last_name}</p>
                   <p className='text-gray-800 text-xs'>You: Parada</p>
                 </div>
 
@@ -179,7 +179,10 @@ function ChatComponents() {
                   </Badge>
                 </div>
               </div>
-            ))}
+            )):(
+              <div className="text-center text-gray-500 pt-5">No results</div>
+
+            )}
 
           </div>
         </div>
