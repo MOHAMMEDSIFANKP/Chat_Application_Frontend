@@ -126,7 +126,7 @@ function ChatComponents() {
   }, [recipientdetails]);
   return (
     <>
-      <Card className='m-5 p-5 bg-gray-300 grid grid-cols-[20rem,1fr] overflow-hidden'>
+      <Card className='m-5 p-5 bg-gray-300 grid lg:grid-cols-[20rem,1fr] overflow-hidden'>
         <div className='grid grid-rows-[3rem,4rem,1fr]'>
           <div className='flex justify-center items-center w-full'>
             <div className='relative w-full'>

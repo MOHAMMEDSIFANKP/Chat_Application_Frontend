@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BiLogOut } from "react-icons/bi";
-import { IoMdAdd, IoMdSettings } from "react-icons/io";
+import { IoMdAdd, IoMdSettings,IoMdNotifications } from "react-icons/io";
 import { BiSolidMessage } from "react-icons/bi";
 import { FaUser } from 'react-icons/fa';
 import Logo from '../../assets/Logo.png'
-import { Tooltip } from '@material-tailwind/react';
+import { Card, List, ListItem, Tooltip } from '@material-tailwind/react';
 import { useNavigate } from 'react-router-dom';
 
 import { LogoutDetails } from '../../Redux/UserSlice';
@@ -17,6 +17,7 @@ function SideBar() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const location = useLocation();
+    const [open,SetOpen] = useState(false)
 
     const currentPath = location.pathname;
 
@@ -38,6 +39,24 @@ function SideBar() {
     };
     return (
         <>
+        {open?<Card className='absolute z-10 top-10 left-24 max-h-96 w-2/6 overflow-x-auto'>
+            <p className='ps-4 pt-2 font-bold'>Notifications</p>
+            <hr className='mx-5 mt-3' />
+            <List >
+                <ListItem className='bg-gray-300'>
+                    <p>Sifan send a connection Requsts</p>
+                </ListItem>
+                <ListItem className='bg-gray-300'>
+                    <p>Sifan send a connection Requsts</p>
+                </ListItem>
+                <ListItem className='bg-gray-300'>
+                    <p>Sifan send a connection Requsts</p>
+                </ListItem>
+                <ListItem className='bg-gray-300'>
+                    <p>Sifan send a connection Requsts</p>
+                </ListItem>
+            </List>
+        </Card>:''}
             <div className='grid grid-rows-[7rem,1fr,1fr,5rem] ms-2'>
                 <div className='flex justify-center items-center'>
                     <img src={Logo} alt="" />
@@ -57,7 +76,15 @@ function SideBar() {
                             </button>
                         </div>
                     </Tooltip>
+                    <Tooltip content="Notifications">
+                        <div onClick={()=>SetOpen(!open)} className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center mt-2'>
+                            <button>
+                                <IoMdNotifications className='h-6 w-6 ' />
+                            </button>
+                        </div>
+                    </Tooltip>
                 </div>
+
                 <div className='text-gray-700'>
                     <hr className='ms-3 border-gray-800' />
                     <Tooltip content="Profile">
