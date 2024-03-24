@@ -150,7 +150,7 @@ function ChatComponents() {
           <div className='flex items-center'>
             <p className='text-xl font-bold text-black'>Chat</p>
           </div>
-          <div className='overflow-y-auto rounded-lg bg-white h-[46rem] '>
+          <div className='overflow-y-auto rounded-lg bg-white max-h-[46rem] '>
             {SearchList.length > 0 ?SearchList.map((userlist) => (
               <div className={`${recipientdetails?.id === userlist.id ? 'h-16 m-2 px-2 bg-gray-200 grid grid-cols-[3rem,1fr,3rem] cursor-pointer rounded-lg' : 'h-16 m-2 px-2 bg-white grid grid-cols-[3rem,1fr,3rem] cursor-pointer hover:rounded-lg hover:bg-gray-100'}`}
                 onClick={() => setrecipientdetails({
@@ -255,12 +255,11 @@ function ChatComponents() {
             </form>
           </div>
         </div>) : (
-          <div
-            className='bg-cover ms-5 rounded-lg'
-            style={{
-              backgroundImage: `url(${Bgimage})`,
-            }}>
-          </div>
+           <Card className='rounded-md ms-5 h-full bg-full flex items-center'
+           style={{
+             backgroundImage: `url(https://img.freepik.com/premium-vector/connecting-people-social-network-concept-bright-background-vector-illustration_191567-956.jpg)`,
+           }}>
+         </Card>
         )}
       </Card>
 

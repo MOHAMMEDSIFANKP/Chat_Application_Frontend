@@ -14,6 +14,33 @@ const Logout = () => {
     });
 };
 
+const CreateRequst = (values) => {
+  return userAxiosInstant
+    .post('chat/connect/',values, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      error.response;
+    });
+};
+const AcceptRequest = (values) => {
+  return userAxiosInstant
+    .post('chat/accepted/',values, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      error.response;
+    });
+};
+const RemoveRequest = (values) => {
+  return userAxiosInstant
+    .post('chat/remove/',values, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      error.response;
+    });
+};
 // ----------------------------------------GET--------------------------------------//
 // Chatting side List User
 const UserList = (search, id) => {
@@ -26,9 +53,9 @@ const UserList = (search, id) => {
     });
 };
 
-const AllUserList = (search, id) => {
+const AllUserList = (id,selectedOption) => {
   return userAxiosInstant
-    .get(`chat/all-user-list/${id}/?search=${search}`, {
+    .get(`chat/all-user-list/${id}/?selectoption=${selectedOption}`, {
       withCredentials: true,
     })
     .catch((error) => {
@@ -72,4 +99,4 @@ const ChatHistory = (senderdetails, recipientdetails) => {
 // ----------------------------------------PUT/PATCH--------------------------------------//
 
 
-export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends};
+export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends,CreateRequst,AcceptRequest,RemoveRequest};

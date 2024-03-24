@@ -70,7 +70,7 @@ function SideBar() {
                         </div>
                     </Tooltip>
                     <Tooltip content="Message">
-                        <div onClick={() => navigate('/chat')} className={`h-10 w-15 ${currentPath === '/chat' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2`}>
+                        <div onClick={() => navigate('/')} className={`h-10 w-15 ${currentPath === '/chat' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2`}>
                             <button>
                                 <BiSolidMessage className='h-6 w-6 ' />
                             </button>

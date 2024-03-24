@@ -22,7 +22,7 @@ function App() {
 
         <Route element ={<Protected/>}>
           <Route path="/" element={<Homepage />} >
-          <Route path="/chat" element={<ChatComponents />} />
+          <Route path="/" element={<ChatComponents />} />
           <Route path="/users" element={<PeopleListComponents />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/settings" element={<Settings />} />

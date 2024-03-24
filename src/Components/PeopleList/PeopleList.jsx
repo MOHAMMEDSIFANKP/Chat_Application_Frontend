@@ -14,8 +14,9 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 import { FaLocationDot } from "react-icons/fa6";
-import { AllUserList, UserDetailsAndFriends } from '../../Service/Services';
+import { AcceptRequest, AllUserList, CreateRequst, RemoveRequest, UserDetailsAndFriends } from '../../Service/Services';
 import { useSelector } from 'react-redux';
+import { ToastError } from '../Toast/Toast';
 
 function Icon({ id, open }) {
   return (
@@ -41,17 +42,15 @@ function PeopleList() {
   const [profile, setProfile] = useState('')
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
-
-
   const handleOptionChange = (event) => {
     setSelectedOption(event);
   };
   // UsersList
   const GetAllUserListFuc = async () => {
     try {
-      const res = await AllUserList(Search, UserInfo.id)
+      const res = await AllUserList(UserInfo.id, selectedOption)
       if (res.status === 200) {
-        setUsers(res.data);
+        setUsers(res.data.data);
       }
     } catch (error) {
       console.log(error);
@@ -61,13 +60,69 @@ function PeopleList() {
     try {
       const res2 = await UserDetailsAndFriends(id, UserInfo.id)
       if (res2.status === 200) {
-        setProfile(res2.data)
+        setProfile(res2.data.data)
       }
     } catch (error) {
       console.log(error);
     }
   }
-  console.log(profile, 'daxoo');
+  // Send Connection Requsts
+  const CreateRequstFuc = async (id) => {
+    const data = {
+      "user_id": UserInfo.id,
+      "friends_id": id,
+      "is_request": true
+    }
+    try {
+      const res3 = await CreateRequst(data)
+      if (res3.status === 201) {
+        GetAllUserListFuc()
+        setProfile({ ...profile, is_connect: 'pending' });
+      }
+    } catch (error) {
+      ToastError('Something is wrong')
+      console.log(error);
+
+    }
+  }
+
+  // Accept the requsts
+  const AcceptRequestFuc = async (id) => {
+    const data={
+      "user_id": id,
+      "friends_id": UserInfo.id,
+    }
+    try {
+      const res4 = await AcceptRequest(data)
+      if (res4.status===200){
+        GetAllUserListFuc()
+        setProfile('')
+      }
+    } catch (error) {
+      
+    }
+  }
+
+    // Remove the requsts
+    const RemoveRequestFuc = async (id) => {
+      const data={
+        "user_id": UserInfo.id,
+        "friends_id": id,
+      }
+      try {
+        const res4 = await RemoveRequest(data)
+        if (res4.status===200){
+          GetAllUserListFuc()
+          setProfile('')
+        }
+      } catch (error) {
+        
+      }
+    }
+  useEffect(() => {
+    GetAllUserListFuc()
+
+  }, [selectedOption]);
   useEffect(() => {
     GetAllUserListFuc()
 
@@ -90,46 +145,23 @@ function PeopleList() {
           >
             <Option value='People'>People</Option>
             <Option value='Requests'>Requests</Option>
-            <Option value='My Friends'>My Friends</Option>
+            <Option value='MyFriends'>My Friends</Option>
           </Select>
         </div>
-        <p className='text-xl font-bold text-black'>People</p>
+        <p className='text-xl font-bold text-black'>{selectedOption}</p>
         <div className='w-full h-full'>
           <Card className="w-full overflow-x-auto max-h-[48rem]">
-            {selectedOption === 'People' ? (<List>
-              {users.filter((user, index) => user.is_friends === 'not_friends').map((user, index) => (
-                <ListItem key={index} onClick={() => GetProfileFunc(user.id)}>
-                  <ListItemPrefix>
-                    <Avatar variant="circular" alt="candice" src={user.profile_image ? user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
-                  </ListItemPrefix>
-                  <div className='grid grid-cols-[1fr,4rem] w-full'>
-                    <div>
-                      <Typography variant="h6" color="blue-gray">
-                        {user.first_name} {user.last_name}
-                      </Typography>
-                      <Typography variant="small" color="gray" className="font-normal">
-                        {user.email}
-                      </Typography>
-                    </div>
-                    <div className='flex justify-center items-center'>
-                      {user.is_friends === 'not_friends' ? (
-                        <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Connect</button>
-                      ) : user.is_friends === 'pending' ? (
-                        <button className='bg-yellow-600 text-white font-bold text-sm p-2 rounded-md'>Pending</button>
-                      ) : (
-                        <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'>Remove</button>
-                      )}
+            <List>
 
-                    </div>
-                  </div>
-                </ListItem>
-              ))}
-            </List>) : selectedOption === 'Requests' ? (
-              <List>
-                {users.filter((user, index) => user.is_friends === 'pending').map((user, index) => (
+              {users.length > 0 ? (
+                users.map((user, index) => (
                   <ListItem key={index} onClick={() => GetProfileFunc(user.id)}>
                     <ListItemPrefix>
-                      <Avatar variant="circular" alt="candice" src={user.profile_image ? user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
+                      <Avatar
+                        variant="circular"
+                        alt="candice"
+                        src={user.profile_image ? user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
+                      />
                     </ListItemPrefix>
                     <div className='grid grid-cols-[1fr,4rem] w-full'>
                       <div>
@@ -141,57 +173,33 @@ function PeopleList() {
                         </Typography>
                       </div>
                       <div className='flex justify-center items-center'>
-                        {user.is_friends === 'not_friends' ? (
-                          <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Connect</button>
-                        ) : user.is_friends === 'pending' ? (
+                        {user?.is_connect === 'not_friends' ? (
+                          <button className='bg-black text-white font-bold text-sm p-2 rounded-md'>Connect</button>
+                        ) : user?.is_connect === 'pending' ? (
                           <button className='bg-yellow-600 text-white font-bold text-sm p-2 rounded-md'>Pending</button>
-                        ) : (
+                        ) : user?.is_connect === 'accept' ? (
+                          <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Accept</button>
+                        ) : user?.is_connect === 'remove' ? (
                           <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'>Remove</button>
-                        )}
-
+                        ) : ""}
                       </div>
                     </div>
                   </ListItem>
-                ))}
-              </List>
-            ) : (
-              <List>
-                {users.filter((user, index) => user.is_friends === 'connected').map((user, index) => (
-                  <ListItem key={index} onClick={() => GetProfileFunc(user.id)}>
-                    <ListItemPrefix>
-                      <Avatar variant="circular" alt="candice" src={user.profile_image ? user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
-                    </ListItemPrefix>
-                    <div className='grid grid-cols-[1fr,4rem] w-full'>
-                      <div>
-                        <Typography variant="h6" color="blue-gray">
-                          {user.first_name} {user.last_name}
-                        </Typography>
-                        <Typography variant="small" color="gray" className="font-normal">
-                          {user.email}
-                        </Typography>
-                      </div>
-                      <div className='flex justify-center items-center'>
-                        {user.is_friends === 'not_friends' ? (
-                          <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Connect</button>
-                        ) : user.is_friends === 'pending' ? (
-                          <button className='bg-yellow-600 text-white font-bold text-sm p-2 rounded-md'>Pending</button>
-                        ) : (
-                          <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'>Remove</button>
-                        )}
+                ))
+              ) : (
+                <p className='text-center text-black pt-3 pb-3'>Result not found</p>
+              )}
 
-                      </div>
-                    </div>
-                  </ListItem>
-                ))}
-              </List>
-            )}
+
+            </List>
           </Card>
         </div>
       </div>
       <div>
-        <Card className='rounded-md h-full'>
-          {profile && (
-            <>
+
+        {profile ? (
+          <>
+            <Card className='rounded-md h-full'>
               <div className='absolute   w-full bg-transparent top-32 z-10' style={{ transform: 'translateZ(0px)' }}>
                 <Avatar variant="circular" alt="candice" className='-top-12 left-[43%] w-32 h-32 absolute z-20' src={profile.profile_image ? profile.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
 
@@ -204,13 +212,15 @@ function PeopleList() {
                       </div>
                     </div>
                     <div className='flex justify-center items-center'>
-                      {profile.is_friends === 'not_friends' ? (
-                        <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Connect</button>
-                      ) : profile.is_friends === 'pending' ? (
+                      {profile?.is_connect === 'not_friends' ? (
+                        <button className='bg-black text-white font-bold text-sm p-2 rounded-md' onClick={() => CreateRequstFuc(profile.id)}>Connect</button>
+                      ) : profile?.is_connect === 'pending' ? (
                         <button className='bg-yellow-600 text-white font-bold text-sm p-2 rounded-md'>Pending</button>
-                      ) : (
-                        <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'>Remove</button>
-                      )}
+                      ) : profile?.is_connect === 'accept' ? (
+                        <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md' onClick={()=>AcceptRequestFuc(profile.id)}>Accept</button>
+                      ) : profile?.is_connect === 'remove' ? (
+                        <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'onClick={()=>RemoveRequestFuc(profile.id)}>Remove</button>
+                      ) : ""}
                     </div>
 
                   </div>
@@ -230,11 +240,11 @@ function PeopleList() {
                 <Card className='mx-5 mt-5'>
                   <Accordion open={open === 1} icon={<Icon id={1} open={open} />}>
                     <AccordionHeader className='ps-3' onClick={() => handleOpen(1)}>{profile?.last_name}'s Friends</AccordionHeader>
-                    <AccordionBody className='h-[16rem] overflow-auto'>
+                    <AccordionBody className='h-30 max-h-[16rem] overflow-auto'>
                       <List>
-                        {profile.friends_list.length > 0 ? profile.friends_list.map((user, index) => (<ListItem>
+                        {profile?.friends_list.length > 0 ? profile.friends_list.map((user, index) => (<ListItem onClick={UserInfo.email===user.email?"":()=>GetProfileFunc(user.id)}>
                           <ListItemPrefix>
-                            <Avatar variant="circular" alt="candice" src="https://docs.material-tailwind.com/img/face-1.jpg" />
+                            <Avatar variant="circular" alt="candice" src={user.profile_image?user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
                           </ListItemPrefix>
                           <div className='grid grid-cols-[1fr,4rem] w-full'>
                             <div>
@@ -242,15 +252,23 @@ function PeopleList() {
                                 {user?.first_name} {user?.last_name}
                               </Typography>
                               <Typography variant="small" color="gray" className="font-normal">
-                                sifan007sifu@gmail.com
+                                {user?.email}
                               </Typography>
                             </div>
                             <div className='flex justify-center items-center'>
-                              <p className='bg-black text-white font-bold text-sm p-2 rounded-md' text>Connect</p>
+                              {UserInfo.email === user.email ? (<><p className='font-bold'>You</p></>) : user?.is_connect === 'not_friends' ? (
+                                <button className='bg-black text-white font-bold text-sm p-2 rounded-md' >Connect</button>
+                              ) : user?.is_connect === 'pending' ? (
+                                <button className='bg-yellow-600 text-white font-bold text-sm p-2 rounded-md'>Pending</button>
+                              ) : user?.is_connect === 'accept' ? (
+                                <button className='bg-green-400 text-white font-bold text-sm p-2 rounded-md'>Accepted</button>
+                              ) : user?.is_connect === 'remove' ? (
+                                <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md'>Remove</button>
+                              ) : ("")}
                             </div>
                           </div>
                         </ListItem>
-                        )) : ''}
+                        )) : <><p className='text-center'>No Result found</p></>}
 
                       </List>
                     </AccordionBody>
@@ -263,9 +281,16 @@ function PeopleList() {
 
               </div>
               <div></div>
-            </>
-          )}
-        </Card>
+            </Card>
+          </>
+        ) : (
+          <Card className='rounded-md h-full bg-full flex items-center'
+            style={{
+              backgroundImage: `url(https://img.freepik.com/premium-vector/connecting-people-social-network-concept-bright-background-vector-illustration_191567-956.jpg)`,
+            }}>
+          </Card>
+        )}
+
       </div>
     </Card>
   )

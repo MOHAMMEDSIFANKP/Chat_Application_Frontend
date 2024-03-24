@@ -48,7 +48,7 @@ function LoginPage() {
         ToastSuccess('Login completed successfully!');
         const decoded = jwtDecode(token);
         ReduxStoring(decoded.user_id);
-        navigate("/chat", {
+        navigate("/", {
           state: { user_id: decoded?.user_id ? decoded?.user_id : null },
         });
       }
