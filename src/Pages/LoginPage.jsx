@@ -89,6 +89,10 @@ function LoginPage() {
         last_name: res.data.last_name,
         email: res.data.email,
         profile_image: res.data.profile_image,
+        state: res.data.state,
+        district: res.data.district,
+        place: res.data.place,
+        bio: res.data.bio,
       };
       dispatch(setUserDetails({ UserInfo: data }));
     }

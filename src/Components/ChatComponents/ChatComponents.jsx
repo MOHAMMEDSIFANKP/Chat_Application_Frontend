@@ -39,7 +39,6 @@ function ChatComponents() {
   };
   useEffect(() => {
     document.title = "Chat page";
-    UsersLists();
   }, []);
   useEffect(() => {
     UsersLists();
@@ -121,9 +120,20 @@ function ChatComponents() {
       console.log(error);
     }
   };
+  const SenderData = async () => {
+    try {
+      const res = await UserDetails(UserInfo.id || user_id);
+      setsenderdetails(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     recieverData();
   }, [recipientdetails]);
+  useEffect(() => {
+    SenderData();
+  }, [user_id]);
   return (
     <>
       <Card className='m-5 p-5 bg-gray-300 grid lg:grid-cols-[20rem,1fr] overflow-hidden'>
@@ -161,22 +171,22 @@ function ChatComponents() {
                   last_name: userlist.last_name
                 })}>
                 <div className='flex justify-center items-center'>
-                  <Badge overlap="circular" color="green" placement="bottom-end">
+                  {/* <Badge overlap="circular" color="green" placement="bottom-end"> */}
                     <Avatar
                       src={userlist.profile_image ? userlist.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
                       alt="profile picture"
                     />
-                  </Badge>
+                  {/* </Badge> */}
                 </div>
 
                 <div className='m-3'>
                   <p className='text-black text-sm capitalize'>{userlist.first_name} {userlist.last_name}</p>
-                  <p className='text-gray-800 text-xs'>You: Parada</p>
+                  <p className='text-gray-800 text-xs'>{`last message : ${userlist?.last_message?.message}`}</p>
                 </div>
 
                 <div className='flex justify-center items-center'>
-                  <Badge content="5">
-                  </Badge>
+                  {/* <Badge content="5">
+                  </Badge> */}
                 </div>
               </div>
             )):(
@@ -216,7 +226,7 @@ function ChatComponents() {
                     <p className='bg-purple-300 py-1 px-2 max-w-md text-white my-1 rounded-s-md rounded-t-md'>{message.message}</p>
                     <Avatar
                       className='w-7 h-7'
-                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"
+                      src={senderdetails.profile_image || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
                       alt="profile picture"
                     />
                   </div>
@@ -226,7 +236,7 @@ function ChatComponents() {
                   <div className='w-full flex justify-start gap-2 ms-2' key={index}>
                     <Avatar
                       className='w-7 h-7'
-                      src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"
+                      src={recipientdetails.profile_image || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
                       alt="profile picture"
                     />
                     <p className='flex bg-white py-1 px-2 text-black max-w-md rounded-e-md my-1 rounded-t-md'>{message.message}</p>

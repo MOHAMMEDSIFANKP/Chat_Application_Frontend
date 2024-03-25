@@ -8,8 +8,8 @@ import PrivateRoutes from "./ProtectedRoutes/PrivateRoutes";
 import Homepage from "./Pages/Homepage";
 import ChatComponents from "./Components/ChatComponents/ChatComponents";
 import PeopleListComponents from "./Components/PeopleList/PeopleList";
-import Profile from "./Components/Profile/Profile";
 import Settings from "./Components/Settings/Settings";
+import UserProfile from "./Components/Profile/UserProfile";
 function App() {
   return (
     <BrowserRouter>
@@ -24,7 +24,7 @@ function App() {
           <Route path="/" element={<Homepage />} >
           <Route path="/" element={<ChatComponents />} />
           <Route path="/users" element={<PeopleListComponents />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>

@@ -17,6 +17,7 @@ import { FaLocationDot } from "react-icons/fa6";
 import { AcceptRequest, AllUserList, CreateRequst, RemoveRequest, UserDetailsAndFriends } from '../../Service/Services';
 import { useSelector } from 'react-redux';
 import { ToastError } from '../Toast/Toast';
+import { useLocation } from 'react-router-dom';
 
 function Icon({ id, open }) {
   return (
@@ -35,22 +36,33 @@ function Icon({ id, open }) {
 
 
 function PeopleList() {
+  const location = useLocation();
+  const type_list = location.state && location.state.type_list;
   const { UserInfo } = useSelector((state) => state.user);
-  const [Search, setSearch] = useState('')
-  const [selectedOption, setSelectedOption] = useState('People');
+  const [selectedOption, setSelectedOption] = useState(type_list || 'People');
   const [users, setUsers] = useState([]);
+  const [Tempusers, setTempUsers] = useState([]);
   const [profile, setProfile] = useState('')
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const handleOptionChange = (event) => {
     setSelectedOption(event);
   };
+  // Search
+  const SearchFuc =(search)=>{
+    if (search === ''){
+      setUsers(Tempusers)
+    }else{
+      // console.log(users.filter((user,index)=> user.email. search));
+    }
+  }
   // UsersList
   const GetAllUserListFuc = async () => {
     try {
       const res = await AllUserList(UserInfo.id, selectedOption)
       if (res.status === 200) {
         setUsers(res.data.data);
+        setTempUsers(res.data.data);
       }
     } catch (error) {
       console.log(error);
@@ -123,10 +135,9 @@ function PeopleList() {
     GetAllUserListFuc()
 
   }, [selectedOption]);
-  useEffect(() => {
-    GetAllUserListFuc()
 
-  }, []);
+
+
   return (
     <Card className='m-5 p-5 grid grid-cols-2 bg-gray-300 gap-6'>
       <div className='w-full grid grid-rows-[3rem,2rem,1fr] gap-2'>
@@ -135,8 +146,7 @@ function PeopleList() {
             type="text"
             className='w-full rounded-lg h-12 bg-gray-50 shadow-xl focus:outline-none pl-3 pr-10' // Adjusted ps-3 to pl-3 and added pr-10
             placeholder='Search'
-
-          // value={Search}
+            onChange={(e)=>SearchFuc(e.target.value)}
           />
           <Select
             className='rounded-lg h-12 bg-gray-50 shadow-xl focus:outline-none'
@@ -226,6 +236,7 @@ function PeopleList() {
                   </div>
                   <div className='text-center mt-16'>
                     <p className='font-bold capitalize text-black text-3xl'>{profile?.first_name} {profile?.last_name}</p>
+                    <p className='text-sm'>{profile.email}</p>
                     <div className='flex justify-center'>
                       <FaLocationDot className='mt-2' />
                       <p className='p-1'>{profile?.place}, {profile?.district}, {profile?.state}</p>

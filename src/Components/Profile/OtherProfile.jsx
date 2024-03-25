@@ -1,5 +1,5 @@
 import { Accordion,AccordionHeader, AccordionBody, Avatar,Typography, Card, List, ListItem, ListItemPrefix } from '@material-tailwind/react'
-import React from 'react'
+import React, { useState } from 'react'
 import { FaLocationDot } from 'react-icons/fa6'
 
 function Icon({ id, open }) {
@@ -17,13 +17,25 @@ function Icon({ id, open }) {
   );
 }
 
-function Profile() {
+function OtherProfile() {
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
+  const [Profile,setProfile] = useState('')
+
+  const UserProfileFuc =async ()=>{
+    try {
+      const res = ''
+      if (res.status==200){
+        
+      }
+    } catch (error) {
+      
+    }
+  }
   return (
       <Card className='rounded-md m-5 bg-gray-300'>
       <div className='absolute   w-full bg-transparent top-40 z-10' style={{ transform: 'translateZ(0px)' }}>
-        <Avatar variant="circular" alt="candice" className='-top-20 left-[45%] w-44 h-44 absolute z-20' src="https://docs.material-tailwind.com/img/face-1.jpg" />
+        <Avatar variant="circular" alt="candice" className='-top-20 left-[45%] w-44 h-44 absolute z-20' src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80" />
 
         <Card className='mx-5 h-96'>
           <div className='grid grid-cols-2 mt-5'>
@@ -162,4 +174,4 @@ function Profile() {
   )
 }
 
-export default Profile
+export default OtherProfile

@@ -18,7 +18,9 @@ const userSlice = createSlice({
               last_name: action.payload.last_name,
               email: action.payload.email,
               profile_image: action.payload.profile_image,
-                
+              state: action.payload.state,
+              district: action.payload.district,
+              place: action.payload.place,
             };
           },
           LogoutDetails: (state, action) => {
