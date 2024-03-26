@@ -22,11 +22,16 @@ import { UserDetails } from "../Service/Services";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../Redux/UserSlice";
 import { jwtDecode } from "jwt-decode";
+import OtpInput from 'react-otp-input';
+
 function RegisterPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch();
 
   const [isGoogle, setIsGoogle] = useState(false)
+  const [ShowOtp, setShowOtp] = useState(false)
+  const [showTimer, setShowTimer] = useState(false);
+  const [otp, setOtp] = useState('')
   const initialValues = {
     first_name: "",
     last_name: "",
@@ -57,11 +62,11 @@ function RegisterPage() {
           ToastSuccess('Registration completed successfully!');
           navigate("/login");
         }
-      }else {
+      } else {
         const response = await axios.post(`${BaseUrl}/auth/googeregister/`, values);
         if (response.status === 201) {
           setIsGoogle(false)
-          console.log(response,'google');
+          console.log(response, 'google');
           const token = JSON.stringify(response.data.token);
           localStorage.setItem("token", token);
           const decoded = jwtDecode(token);
@@ -72,7 +77,7 @@ function RegisterPage() {
           });
         }
       }
-      
+
     } catch (error) {
       setIsGoogle(false)
       console.log(error);
@@ -92,35 +97,35 @@ function RegisterPage() {
     if (guser && guser.access_token) {
       axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${guser.access_token}`)
         .then((res) => {
-          RegisterhandleSubmitForm({first_name: res.data.given_name, last_name: res.data.family_name, profile_image: res.data.picture, email: res.data.email, password: res.data.id })
+          RegisterhandleSubmitForm({ first_name: res.data.given_name, last_name: res.data.family_name, profile_image: res.data.picture, email: res.data.email, password: res.data.id })
         })
         .catch((err) => {
           setIsGoogle(false);
         });
     }
   }, [guser, login]);
-  
+
 
 
   // usedata storing Redux
   const ReduxStoring = async (id) => {
     try {
       const res = await UserDetails(id);
-    if (res.status === 200) {
-      const data = {
-        id: res.data.id,
-        first_name: res.data.first_name,
-        last_name: res.data.last_name,
-        email: res.data.email,
-        profile_image: res.data.profile_image,
-        state: res.data.state,
-        district: res.data.district,
-        place: res.data.place,
-        bio: res.data.bio,
-        is_google : res.data?.is_google,
-      };
-      dispatch(setUserDetails({ UserInfo: data }));
-    }
+      if (res.status === 200) {
+        const data = {
+          id: res.data.id,
+          first_name: res.data.first_name,
+          last_name: res.data.last_name,
+          email: res.data.email,
+          profile_image: res.data.profile_image,
+          state: res.data.state,
+          district: res.data.district,
+          place: res.data.place,
+          bio: res.data.bio,
+          is_google: res.data?.is_google,
+        };
+        dispatch(setUserDetails({ UserInfo: data }));
+      }
     } catch (error) {
       console.log(error);
     }
@@ -128,6 +133,16 @@ function RegisterPage() {
   useEffect(() => {
     document.title = "Register Page";
   }, []);
+
+
+  const handleConfirmClick = () => {
+    setShowTimer(true);
+    setTimeout(() => {
+      setShowTimer(false);
+    }, 10000);
+  };
+
+
   return (
     <>
       <div
@@ -140,7 +155,46 @@ function RegisterPage() {
           shadow={true}
           className="border bg-opacity-60 px-10 py-20 sm:py-10"
         >
-          <Typography variant="h4" color="blue-gray">
+        {/* <>
+        <Typography variant="h4" color="blue-gray">
+            Enter Otp
+          </Typography>
+          <div className="w-full h-full my-10">
+            <OtpInput
+              value={otp}
+              onChange={setOtp}
+              numInputs={4}
+              inputType="tel"
+              renderSeparator={<span>-</span>}
+              renderInput={(props, index) => (
+                <input
+                  {...props}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    fontSize: "20px",
+                    textAlign: "center",
+                    margin: "0 10px",
+                    border: "1px solid gray",
+                    borderRadius: "5px",
+                  }}
+                />
+              )}
+            />
+          </div>
+          <div className="flex justify-between">
+            <button onClick={()=>navigate('/login')} className="font-bold p-1 border border-gray-700 rounded-lg">Cancel</button>
+            <button onClick={handleConfirmClick} className="font-bold p-1 border bg-gray-300 border-gray-700 rounded-lg">Conform</button>
+          </div>
+          <div>
+            {showTimer && (
+              <div>
+                <p>Resend OTP in 1 minute</p>
+              </div>
+            )}
+          </div>
+        </> */}
+           <Typography variant="h4" color="blue-gray">
             Create a Connection
           </Typography>
           <div className='mt-8 mb-3 w-full'>
