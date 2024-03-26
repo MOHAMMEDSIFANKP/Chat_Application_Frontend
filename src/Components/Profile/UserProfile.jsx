@@ -1,11 +1,12 @@
 import { Accordion, AccordionHeader, AccordionBody, Avatar, Typography, Card, List, ListItem, ListItemPrefix } from '@material-tailwind/react'
 import React, { useEffect, useState } from 'react'
 import { FaLocationDot } from 'react-icons/fa6'
-import { UserDetails } from '../../Service/Services';
+import { RemoveRequest, UserDetails } from '../../Service/Services';
 import { jwtDecode } from 'jwt-decode';
 import { FaUserEdit } from "react-icons/fa";
 import { UserEditModal } from '../Modal/UserEditModal';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Icon({ id, open }) {
   return (
@@ -23,6 +24,7 @@ function Icon({ id, open }) {
 }
 
 function UserProfile() {
+  const navigate = useNavigate()
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [Profile, setProfile] = useState([])
@@ -35,6 +37,21 @@ function UserProfile() {
       const res = await UserDetails(decoded.user_id);
       if (res.status == 200) {
         setProfile(res.data)
+      }
+    } catch (error) {
+
+    }
+  }
+  // Remove the requsts
+  const RemoveRequestFuc = async (id) => {
+    const data = {
+      "user_id": UserInfo.id,
+      "friends_id": id,
+    }
+    try {
+      const res4 = await RemoveRequest(data)
+      if (res4.status === 200) {
+        UserProfileFuc()
       }
     } catch (error) {
 
@@ -79,11 +96,18 @@ function UserProfile() {
               <List>
                 {Profile?.friends_list ? (
                   Profile?.friends_list.map((user, index) => (
-                    <ListItem key={index}>
-                      <ListItemPrefix>
-                        <Avatar variant="circular" alt="candice" src={user.profile_image || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
-                      </ListItemPrefix>
-                      <div className='grid grid-cols-[1fr,4rem] w-full'>
+                    <div key={index} className='grid grid-cols-[1fr,5.5rem] my-1 cursor-pointer hover:bg-gray-200 hover:rounded-lg'>
+                      <div className='grid grid-cols-[4.5rem,1fr] py-3 ' onClick={() => navigate(`/profile/${user.email}`, {
+                        state: { friends_id: user.id },
+                      })}>
+                        <div className='flex justify-center items-center'>
+                          <Avatar
+                            variant="circular"
+                            alt="candice"
+                            src={user.profile_image ? user.profile_image : "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
+                          />
+                        </div>
+
                         <div>
                           <Typography variant="h6" color="blue-gray">
                             {user.first_name} {user.last_name}
@@ -92,11 +116,13 @@ function UserProfile() {
                             {user.email}
                           </Typography>
                         </div>
-                        <div className='flex justify-center items-center'>
-                          <p className='bg-red-500 text-white font-bold text-sm p-2 rounded-md'>Remove</p>
-                        </div>
                       </div>
-                    </ListItem>
+                      <div className='flex justify-center items-center '>
+                        <button className='bg-red-400 text-white font-bold text-sm p-2 rounded-md' onClick={() => RemoveRequestFuc(user.id)}>Remove</button>
+                      </div>
+
+                    </div>
+
                   ))
                 ) : (
                   <p>No friends to display</p>

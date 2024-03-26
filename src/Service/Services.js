@@ -41,6 +41,18 @@ const RemoveRequest = (values) => {
       error.response;
     });
 };
+
+const ResetPassword = (values) => {
+  return userAxiosInstant
+    .post('auth/changepassword/',values, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      error.response;
+      throw error;
+
+    });
+};
 // ----------------------------------------GET--------------------------------------//
 // Chatting side List User
 const UserList = (search, id) => {
@@ -141,4 +153,4 @@ const UserPrfileUpdate = (id,values) => {
     });
 };
 
-export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends,CreateRequst,AcceptRequest,RemoveRequest,UserNotification,IsReadUpdate,UserNotificationCount,UserPrfileUpdate};
+export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends,CreateRequst,AcceptRequest,RemoveRequest,UserNotification,IsReadUpdate,UserNotificationCount,UserPrfileUpdate,ResetPassword};

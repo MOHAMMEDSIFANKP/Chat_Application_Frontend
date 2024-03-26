@@ -109,7 +109,7 @@ function SideBar() {
     }, [])
     return (
         <>
-            {open ? <Card className='absolute z-10 top-10 left-24 max-h-96 w-2/6 overflow-x-auto'>
+            {open ? <Card className='absolute z-20 top-10 md:left-24 left-16 max-h-96 md:w-2/6 w-5/6 overflow-x-auto'>
                 <p className='ps-4 pt-2 font-bold'>Notifications</p>
                 <hr className='mx-5 mt-3' />
                 <List >
@@ -123,8 +123,8 @@ function SideBar() {
                 </List>
             </Card> : ''}
             <div className='grid grid-rows-[7rem,1fr,1fr,5rem] ms-2'>
-                <div className='flex justify-center items-center'>
-                    <img src={Logo} alt="" />
+                <div className='flex justify-center items-center ' >
+                    <img src={Logo} alt="" onClick={()=>navigate('/')} className='cursor-pointer' />
                 </div>
                 <div className='text-gray-700'>
                     <Tooltip content="Add Friends">
@@ -155,19 +155,19 @@ function SideBar() {
                 <div className='text-gray-700'>
                     <hr className='ms-3 border-gray-800' />
                     <Tooltip content="Profile">
-                        <div onClick={() => navigate('/profile')} className={`h-10 w-15 ${currentPath === '/profile' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center my-2`}>
+                        <div onClick={() => navigate('/profile')} className={`h-10 w-15 ${currentPath === '/profile' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center my-2 cursor-pointer`}>
                             <button>
                                 <FaUser className='h-6 w-6 ' />
                             </button>
                         </div>
                     </Tooltip>
-                    <Tooltip content="Settings">
-                        <div onClick={() => navigate('/settings')} className={`h-10 w-15 ${currentPath === '/settings' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2`}>
+                    <Tooltip content="Settings" >
+                        <div onClick={() => navigate('/settings')} className={`h-10 w-15 ${currentPath === '/settings' ? 'bg-white rounded-lg' : 'hover:bg-white hover:rounded-lg'} flex justify-center items-center mt-2 cursor-pointer`}>
                             <IoMdSettings className='w-6 h-6' />
                         </div>
                     </Tooltip>
                 </div>
-                <div className='text-gray-600 flex justify-center'>
+                <div className='text-gray-600 flex justify-center cursor-pointer'>
                     <Tooltip content="Logout">
                         <div onClick={SignoutFunc} className='h-10 w-15 hover:bg-white hover:rounded-lg flex justify-center items-center'>
                             <BiLogOut className='w-6 h-6' />

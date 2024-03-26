@@ -21,70 +21,11 @@ import { RegisterSchema } from "../Formik/Validations";
 import { UserDetails } from "../Service/Services";
 import { useDispatch } from "react-redux";
 import { setUserDetails } from "../Redux/UserSlice";
+import { jwtDecode } from "jwt-decode";
 function RegisterPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch();
 
-  // const [Form, setForm] = useState({
-  //   first_name: "",
-  //   last_name: "",
-  //   email: "",
-  //   password: "",
-  // });
-  // const [error, seterror] = useState({
-  //   first_name: false,
-  //   last_name: false,
-  //   email: false,
-  //   password: false,
-  // });
-  // //   Validation
-  // function Validation() {
-  //   if (Form.first_name.trim() === "") {
-  //     seterror({ ...error, first_name: true });
-  //     ToastWarning("First name should be empty");
-  //     return false;
-  //   } else if (Form.last_name.trim() === "") {
-  //     seterror({ ...error, last_name: true });
-  //     ToastWarning("Last name should be empty");
-  //     return false;
-  //   } else if (Form.email.trim() === "") {
-  //     seterror({ ...error, email: true });
-  //     ToastWarning("Email name should be empty");
-  //     return false;
-  //   } else if (!isValidEmail(Form.email.trim())) {
-  //     seterror({ ...error, email: true });
-  //     ToastWarning("Please enter Valid email");
-  //     return false;
-  //   } else if (Form.password.trim() === "") {
-  //     seterror({ ...error, password: true });
-  //     ToastWarning("Password should be empty");
-  //     return false;
-  //   }
-  //   return true;
-  // }
-  // function isValidEmail(email) {
-  //   const Regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  //   return Regex.test(email);
-  // }
-  // //   Form Submission
-  // const FormSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (Validation()) {
-  //     try {
-  //       const response = await axios.post(`${BaseUrl}/auth/registration/`, Form);
-  //         if (response.status === 201){
-  //           ToastSuccess("Registration completed successfully!");
-  //           navigate('/login')
-  //         }
-  //     } catch (error) {
-  //       if (error.response.data){
-  //         ToastError(error.response.data.email[0])
-  //       }else{
-  //         console.log(error);
-  //       }
-  //     }
-  //   }
-  // };
   const [isGoogle, setIsGoogle] = useState(false)
   const initialValues = {
     first_name: "",
@@ -119,14 +60,13 @@ function RegisterPage() {
       }else {
         const response = await axios.post(`${BaseUrl}/auth/googeregister/`, values);
         if (response.status === 201) {
-          console.log(response,'daxoo');
           setIsGoogle(false)
+          console.log(response,'google');
           const token = JSON.stringify(response.data.token);
           localStorage.setItem("token", token);
+          const decoded = jwtDecode(token);
+          ReduxStoring(decoded.user_id);
           ToastSuccess(response.data?.msg || 'Registration compleated');
-          // const decoded = jwtDecode(token);
-          // console.log(decoded);
-          // ReduxStoring(decoded.user_id);
           navigate("/", {
             state: { user_id: decoded?.user_id ? decoded?.user_id : null },
           });
@@ -135,6 +75,7 @@ function RegisterPage() {
       
     } catch (error) {
       setIsGoogle(false)
+      console.log(error);
       ToastError(error.response?.data?.email[0] || 'An error occurred');
     } finally {
       setSubmitting(false);
@@ -155,7 +96,6 @@ function RegisterPage() {
         })
         .catch((err) => {
           setIsGoogle(false);
-          console.log(err);
         });
     }
   }, [guser, login]);
@@ -164,7 +104,8 @@ function RegisterPage() {
 
   // usedata storing Redux
   const ReduxStoring = async (id) => {
-    const res = await UserDetails(id);
+    try {
+      const res = await UserDetails(id);
     if (res.status === 200) {
       const data = {
         id: res.data.id,
@@ -172,8 +113,16 @@ function RegisterPage() {
         last_name: res.data.last_name,
         email: res.data.email,
         profile_image: res.data.profile_image,
+        state: res.data.state,
+        district: res.data.district,
+        place: res.data.place,
+        bio: res.data.bio,
+        is_google : res.data?.is_google,
       };
       dispatch(setUserDetails({ UserInfo: data }));
+    }
+    } catch (error) {
+      console.log(error);
     }
   };
   useEffect(() => {

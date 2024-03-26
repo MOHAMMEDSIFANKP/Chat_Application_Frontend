@@ -65,6 +65,7 @@ export function UserEditModal() {
                     district: response.data.district,
                     place: response.data.place,
                     bio: response.data.bio,
+                    is_google : response.data?.is_google,
                 }
                 dispatch(setUserDetails({ UserInfo: data }));
             }

@@ -6,15 +6,15 @@ export const LoginSchema = Yup.object({
 });
 
 export const RegisterSchema = Yup.object({
-  first_name: Yup.string().trim().min(4).required("Please enter first_name"),
-  last_name: Yup.string().trim().min(2).required("Please enter last_name"),
+  first_name: Yup.string().trim().min(4).required("Please enter first name"),
+  last_name: Yup.string().trim().min(2).required("Please enter last name"),
   email: Yup.string().trim().email().required("Please enter your email id"),
   password: Yup.string().trim().min(4).required("Please enter password"),
 });
 
 export const EditUserProfileSchema = Yup.object({
-  first_name: Yup.string().trim().min(4).required("Please enter first_name"),
-  last_name: Yup.string().trim().min(2).required("Please enter last_name"),
+  first_name: Yup.string().trim().min(4).required("Please enter first name"),
+  last_name: Yup.string().trim().min(2).required("Please enter last name"),
   district: Yup.string().trim().min(4).required("Please enter your country"),
   state: Yup.string().trim().min(4).required("Please enter your state"),
   place: Yup.string().trim().min(4).required("Please enter your place"),
@@ -27,4 +27,9 @@ export const EditUserProfileSchema = Yup.object({
       return wordCount <= 40;
     }
   ).required("Please enter your bio"),
+});
+
+export const ResetpasswordSchema = Yup.object({
+  new_password: Yup.string().trim().min(4).required("Please enter new password"),
+  old_password: Yup.string().trim().min(4).required("Please enter old password"),
 });

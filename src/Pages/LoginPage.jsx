@@ -19,6 +19,7 @@ import { UserDetails } from "../Service/Services";
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isGoogle, setIsGoogle] = useState(false)
 
   // Autherndication
   const initialValues = {
@@ -41,8 +42,33 @@ function LoginPage() {
   });
   const handleSubmitForm = async (values, setSubmitting) => {
     try {
+      if (!isGoogle) {
       const response = await axios.post(`${BaseUrl}/auth/token/`, values);
-      if (response.status === 200) {
+      if (response.status === 200 || response.status===201) {
+        const token = JSON.stringify(response.data);
+        localStorage.setItem("token", token);
+        ToastSuccess('Login completed successfully!');
+        const decoded = jwtDecode(token);
+        ReduxStoring(decoded.user_id);
+        navigate("/", {
+          state: { user_id: decoded?.user_id ? decoded?.user_id : null },
+        });
+      }
+      }else{
+        const response = await axios.post(`${BaseUrl}/auth/googeregister/`, values);
+        if (response.status === 200 || response.status===201) {
+          const token = JSON.stringify(response.data.token);
+          console.log(token,'google');
+          localStorage.setItem("token", token);
+          ToastSuccess('Login completed successfully!');
+          const decoded = jwtDecode(token);
+          ReduxStoring(decoded.user_id);
+          navigate("/", {
+            state: { user_id: decoded?.user_id ? decoded?.user_id : null },
+          });
+        }
+      }
+      if (response.status === 200 || response.status===201) {
         const token = JSON.stringify(response.data);
         localStorage.setItem("token", token);
         ToastSuccess('Login completed successfully!');
@@ -53,9 +79,14 @@ function LoginPage() {
         });
       }
     } catch (error) {
+      setIsGoogle(false)
       ToastError(error.response?.data?.detail || 'An error occurred');
     } finally {
-      setSubmitting(false);
+      if (isGoogle){
+        setIsGoogle(false)
+      }else{
+        setSubmitting(false);
+      }
     }
   };
   // Google Login Function
@@ -72,16 +103,19 @@ function LoginPage() {
       axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${guser.access_token}`)
         .then((res) => {
           console.log(res.data);
-          handleSubmitForm({email:res.data.email,password:res.data.id})
+          handleSubmitForm({ email: res.data.email, password: res.data.id })
         })
-        .catch((err) => console.log(err));
-    }
+        .catch((err) => {
+          setIsGoogle(false);
+        });
+      }
   }, [guser]);
-  
+
 
   // usedata storing Redux
   const ReduxStoring = async (id) => {
-    const res = await UserDetails(id);
+    try {
+      const res = await UserDetails(id);
     if (res.status === 200) {
       const data = {
         id: res.data.id,
@@ -93,8 +127,12 @@ function LoginPage() {
         district: res.data.district,
         place: res.data.place,
         bio: res.data.bio,
+        is_google : res.data?.is_google,
       };
       dispatch(setUserDetails({ UserInfo: data }));
+    }
+    } catch (error) {
+      console.log(error);
     }
   };
   useEffect(() => {
@@ -116,7 +154,7 @@ function LoginPage() {
             Connect To People{" "}
           </Typography>
           <div className='mt-8 mb-3 w-full'>
-            <button className="gsi-material-button w-full" onClick={login}>
+            <button className="gsi-material-button w-full" onClick={()=>{login(),setIsGoogle(true)}}>
               <div className="gsi-material-button-state"></div>
               <div className="gsi-material-button-content-wrapper">
                 <div className="gsi-material-button-icon">
@@ -145,7 +183,7 @@ function LoginPage() {
             <div className="mb-1 flex flex-col gap-6">
               <div>
                 <Input
-                autoFocus={true}
+                  autoFocus={true}
                   variant="standard"
                   label="Email"
                   name='email'

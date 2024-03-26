@@ -10,6 +10,8 @@ import ChatComponents from "./Components/ChatComponents/ChatComponents";
 import PeopleListComponents from "./Components/PeopleList/PeopleList";
 import Settings from "./Components/Settings/Settings";
 import UserProfile from "./Components/Profile/UserProfile";
+import OtherProfile from "./Components/Profile/OtherProfile";
+import PageNotFound from "./Pages/PageNotFound";
 function App() {
   return (
     <BrowserRouter>
@@ -24,8 +26,10 @@ function App() {
           <Route path="/" element={<Homepage />} >
           <Route path="/" element={<ChatComponents />} />
           <Route path="/users" element={<PeopleListComponents />} />
-          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/profile/" element={<UserProfile />} />
+          <Route path="/profile/:email" element={<OtherProfile />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/*" element={<PageNotFound />} />
           </Route>
         </Route>
       </Routes>
