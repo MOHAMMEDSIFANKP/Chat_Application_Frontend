@@ -44,7 +44,7 @@ function LoginPage() {
     try {
       if (!isGoogle) {
       const response = await axios.post(`${BaseUrl}/auth/token/`, values);
-      if (response.status === 200 || response.status===201) {
+      if (response?.status === 200 || response.status===201) {
         const token = JSON.stringify(response.data);
         localStorage.setItem("token", token);
         ToastSuccess('Login completed successfully!');
@@ -68,7 +68,7 @@ function LoginPage() {
           });
         }
       }
-      if (response.status === 200 || response.status===201) {
+      if (response?.status === 200 || response.status===201) {
         const token = JSON.stringify(response.data);
         localStorage.setItem("token", token);
         ToastSuccess('Login completed successfully!');
@@ -116,7 +116,7 @@ function LoginPage() {
   const ReduxStoring = async (id) => {
     try {
       const res = await UserDetails(id);
-    if (res.status === 200) {
+    if (res?.status === 200) {
       const data = {
         id: res.data.id,
         first_name: res.data.first_name,
