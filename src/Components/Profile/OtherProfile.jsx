@@ -110,7 +110,7 @@ const RemoveRequestFuc = async (id) => {
         <Card className='mx-5 h-96'>
           <div className='grid grid-cols-2 mt-5'>
             <div className='flex justify-center items-center'>
-              <div>
+              <div className=' hover:rounded-md cursor-pointer' onClick={() => handleOpen(1)}>
                 <p className='text-center font-bold text-2xl'>{Profile?.friends_count}</p>
                 <p className='text-center text-sm text-gray-500'>Friends</p>
               </div>

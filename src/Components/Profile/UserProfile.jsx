@@ -1,12 +1,14 @@
 import { Accordion, AccordionHeader, AccordionBody, Avatar, Typography, Card, List, ListItem, ListItemPrefix } from '@material-tailwind/react'
 import React, { useEffect, useState } from 'react'
 import { FaLocationDot } from 'react-icons/fa6'
-import { RemoveRequest, UserDetails } from '../../Service/Services';
+import { RemoveRequest, UserDetails, UserPrfileImageUpdate } from '../../Service/Services';
 import { jwtDecode } from 'jwt-decode';
 import { FaUserEdit } from "react-icons/fa";
 import { UserEditModal } from '../Modal/UserEditModal';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { ToastError, ToastSuccess } from '../Toast/Toast';
+import { setUserDetails } from '../../Redux/UserSlice';
 
 function Icon({ id, open }) {
   return (
@@ -25,11 +27,13 @@ function Icon({ id, open }) {
 
 function UserProfile() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [open, setOpen] = React.useState(0);
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
   const [Profile, setProfile] = useState([])
   const token = localStorage.getItem('token')
   const decoded = jwtDecode(token);
+  const [profile_image, setProfile_image] = useState('')
   const { UserInfo } = useSelector((state) => state.user);
 
   const UserProfileFuc = async () => {
@@ -60,10 +64,50 @@ function UserProfile() {
   useEffect(() => {
     UserProfileFuc()
   }, [])
+
+
+  const openFileInput = () => {
+    const fileInput = document.getElementById('profileImageInput');
+    fileInput.click();
+  }
+  const handleProfileImageChange = async (event) => {
+    const file = event.target.files[0];
+    setProfile_image(file)
+    try {
+      const formData = new FormData();
+      formData.append('profile_image', file);
+      const response = await UserPrfileImageUpdate(UserInfo.id, formData)
+      if (response?.status === 200) {
+        handleOpen()
+        const data = {
+          id: UserInfo.id,
+          first_name: UserInfo.first_name,
+          last_name: UserInfo.last_name,
+          email: UserInfo.email,
+          profile_image: response.data.profile_image,
+          state: UserInfo.state,
+          district: UserInfo.district,
+          place: UserInfo.place,
+          bio: UserInfo.bio,
+          is_google: UserInfo.is_google,
+        }
+        ToastSuccess('Profile image updated successfully!');
+        dispatch(setUserDetails({ UserInfo: data }));
+      }
+    } catch (error) {
+      console.log(error);
+      ToastError('Something Worng')
+
+    }
+  }
+
   return (
     <Card className='rounded-md m-5 bg-gray-300'>
       <div className='absolute   w-full bg-transparent top-40 z-10' style={{ transform: 'translateZ(0px)' }}>
-        <Avatar variant="circular" alt="candice" className='-top-20 left-[45%] w-44 h-44 absolute z-20' src={UserInfo.profile_image || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"} />
+        <Avatar variant="circular" alt="candice" className='-top-20 left-[45%] w-44 h-44 absolute z-20' src={profile_image ? URL.createObjectURL(profile_image) : UserInfo.profile_image || "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&amp;ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&amp;auto=format&amp;fit=crop&amp;w=1480&amp;q=80"}
+          onClick={openFileInput}
+        />
+        <input type="file" id="profileImageInput" style={{ display: 'none' }} accept="image/*" onChange={handleProfileImageChange} />
         <Card className='mx-5 h-96'>
           <div className='grid grid-cols-2 mt-5'>
             <div className='flex justify-center items-center'>

@@ -126,6 +126,7 @@ const UserNotificationCount = (user_id) => {
     })
     .catch((error) => {
       error.response;
+      throw error;
     });
 };
 
@@ -152,5 +153,16 @@ const UserPrfileUpdate = (id,values) => {
       error.response;
     });
 };
+// Profile image updater
+const UserPrfileImageUpdate = (id,values) => {
+  return userAxiosInstant
+    .patch(`auth/profile-update/${id}/`,values, {
+      withCredentials: true,
+    })
+    .catch((error) => {
+      error.response;
+      throw error;
+    });
+};
 
-export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends,CreateRequst,AcceptRequest,RemoveRequest,UserNotification,IsReadUpdate,UserNotificationCount,UserPrfileUpdate,ResetPassword};
+export { Logout, UserList, UserDetails, ChatHistory ,AllUserList,UserDetailsAndFriends,CreateRequst,AcceptRequest,RemoveRequest,UserNotification,IsReadUpdate,UserNotificationCount,UserPrfileUpdate,ResetPassword,UserPrfileImageUpdate};

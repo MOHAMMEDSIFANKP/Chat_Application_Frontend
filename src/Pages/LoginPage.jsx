@@ -68,18 +68,10 @@ function LoginPage() {
           });
         }
       }
-      if (response?.status === 200 || response.status===201) {
-        const token = JSON.stringify(response.data);
-        localStorage.setItem("token", token);
-        ToastSuccess('Login completed successfully!');
-        const decoded = jwtDecode(token);
-        ReduxStoring(decoded.user_id);
-        navigate("/", {
-          state: { user_id: decoded?.user_id ? decoded?.user_id : null },
-        });
-      }
+    
     } catch (error) {
       setIsGoogle(false)
+      console.log(error);
       ToastError(error.response?.data?.detail || 'An error occurred');
     } finally {
       if (isGoogle){

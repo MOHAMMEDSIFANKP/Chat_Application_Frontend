@@ -8,7 +8,7 @@ import { IoClose } from "react-icons/io5";
 import { IoSearch } from "react-icons/io5";
 import Bgimage from '../../assets/ConnectToPeople.avif'
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { UserDetails, UserList } from '../../Service/Services';
 import { useSelector } from 'react-redux';
 import { userAxiosInstant } from '../../AxiosUtils/AxiosUtils';
@@ -16,6 +16,7 @@ import { w3cwebsocket } from 'websocket';
 import { wsApiUrl } from '../../constants/constants';
 
 function ChatComponents() {
+  const navigate = useNavigate()
   const location = useLocation();
   const user_id = location.state && location.state.user_id;
   const { UserInfo } = useSelector((state) => state.user);
@@ -75,7 +76,7 @@ function ChatComponents() {
         }
       });
     const client = new w3cwebsocket(
-      `${wsApiUrl}/ws/chat/${senderdetails.id}/?${recipientdetails.id}`
+      `${wsApiUrl}/ws/chat/${senderdetails.id}/?${recipientdetails?.id}`
     );
     setClientState(client);
     client.onopen = () => {
@@ -114,7 +115,7 @@ function ChatComponents() {
 
   const recieverData = async () => {
     try {
-      const res = await UserDetails(Reciever.id);
+      const res = await UserDetails(Reciever?.id ||'');
       setrecipientdetails(res.data);
     } catch (error) {
       console.log(error);
@@ -206,7 +207,9 @@ function ChatComponents() {
                 />
               </Badge>
             </div>
-            <div className='text-black ms-2'>
+            <div className='text-black ms-2 cursor-pointer hover:mb-3 hover:rounded-lg' onClick={() => navigate(`/profile/${recipientdetails.email}`, {
+                        state: { friends_id: recipientdetails.id },
+                      })}>
               <p className='text-lg font-bold capitalize'>{recipientdetails.first_name} {recipientdetails.last_name}</p>
               <p className='text-xs text-gray-600'>{recipientdetails.email}</p>
             </div>
